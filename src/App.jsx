@@ -5,10 +5,24 @@ const App = () => {
 	const [annualInterestRate, setAnnualInterestRate] = useState(0)
 	const [loanTerm, setLoanTerm] = useState(0)
 	const [error, setError] = useState(false)
+	const [errorMessage, setErrorMessage] = useState('')
 	const [monthlyPayment, setMonthlyPayment] = useState(null)
 
 	const submitCalculation = () => {
 		if (!loanAmount || !annualInterestRate || !loanTerm) {
+			if (!loanAmount) {
+				setErrorMessage('* Please enter the loan amount')
+			} else if (loanAmount <= 0) {
+				setErrorMessage('* Loan amount must be greater than 0')
+			} else if (!annualInterestRate) {
+				setErrorMessage('* Please enter the annual interest rate')
+			} else if (annualInterestRate <= 0 || annualInterestRate >= 90) {
+				setErrorMessage(
+					'* Annual interest rate must be greater than 0 and less than 90'
+				)
+			} else if (!loanTerm) {
+				setErrorMessage('* Please select the loan term')
+			}
 			setError(true)
 
 			setTimeout(() => {
@@ -28,8 +42,10 @@ const App = () => {
 
 		if (
 			!isNaN(monthlyPayment) &&
-			loanAmount !== 0 &&
-			annualInterestRate !== 0
+			loanAmount > 0 &&
+			annualInterestRate > 0 &&
+			annualInterestRate <= 90 &&
+			loanTerm > 0
 		) {
 			setMonthlyPayment(monthlyPayment.toFixed(2).replace('.', ','))
 		} else {
@@ -114,9 +130,10 @@ const App = () => {
 				</div>
 				{error && (
 					<div className="text-red-500 font-base text-sm bg-gray-50 px-6 py-2 rounded-lg shadow-md mb-5">
-						* Please fill all the fields
+						{errorMessage}
 					</div>
 				)}
+
 				<div className="mb-6">
 					<button onClick={submitCalculation} type="button" className="button">
 						Calculate
